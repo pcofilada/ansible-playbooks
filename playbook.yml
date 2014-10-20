@@ -1,0 +1,14 @@
+---
+- hosts: all
+  remote_user: root
+  sudo: true
+  vars:
+    sys_packages: ['nginx','git']
+  tasks:
+    - name: Update apt-cache
+      apt: update_cache=yes
+
+    - name: Installing Packages
+      apt: pkg={{ item }} state=latest
+      with_items: sys_packages
+
