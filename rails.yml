@@ -1,0 +1,35 @@
+---
+- hosts: all
+  remote_user: root
+  sudo: true
+  vars:
+    sys_packages: ['nginx','git']
+    dependencies: ['curl','zlib1g-dev','build-essential','libssl-dev','libreadline-dev','libyaml-dev','libsqlite3-dev','sqlite3','libxml2-dev','libxslt1-dev','libcurl4-openssl-dev','python-software-properties']
+    rvm: ['libgdbm-dev','libncurses5-dev','automake','libtool','bison','libffi-dev']
+  tasks:
+    - name: Update apt-cache
+      apt: update_cache=yes
+
+    - name: Installing Packages
+      apt: pkg={{ item }} state=latest
+      with_items: sys_packages
+
+    - name: Installing Dependencies for Ruby
+      apt: pkg={{ item }} state=latest
+      with_items: dependencies
+
+    - name: Installing Dependencies for RVM
+      apt: pkg={{ item }} state=latest
+      with_items: rvm
+
+    - name: Installing RVM with rails and bundler gem
+      action: shell \curl -sSL https://get.rvm.io | bash -s stable --ruby=jruby --gems=rails,bundler
+
+    - name: Add NodeJS repository
+      apt_repository: repo='ppa:chris-lea/node.js' state=present
+
+    - name: Update apt-cache
+      apt: update_cache=yes
+
+    - name: Installing NodeJS
+      apt: name=nodejs state=present
